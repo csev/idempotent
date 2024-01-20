@@ -172,6 +172,7 @@ public class Util {
     {
         ResultSetMetaData md = getMetadata(sqlService, table);
         if ( md == null ) return false;
+
         ColumnMetaData cm = getColumnMetaData(sqlService, table, column, md);
         if ( cm != null ) return false;
 
