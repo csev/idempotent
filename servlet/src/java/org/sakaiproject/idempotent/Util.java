@@ -20,7 +20,7 @@
 
 package org.sakaiproject.idempotent;
 
-import lombok.extern.slf4j.Slf4j;
+import java.util.List;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -28,7 +28,10 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.sakaiproject.db.api.SqlService;
+import org.sakaiproject.db.api.SqlReader;
 
 @SuppressWarnings("deprecation")
 @Slf4j
@@ -36,6 +39,34 @@ public class Util {
 
     public static String NUMBER_TYPE = "java.lang.Number";
     public static String STRING_TYPE = "java.lang.String";
+
+    /**
+     *
+     */
+    public static void ensureIdempotentTable(SqlService sqlService)
+    {
+        if ( ! tableExists(sqlService, "SAKAI_IDEMPOTENT") ) {
+            String sql = "CREATE TABLE SAKAI_IDEMPOTENT ( " +
+                "MIGRATION_ID INT NOT NULL AUTO_INCREMENT, " +
+                "NOTE VARCHAR (256) NOT NULL, " +
+                "SQL_TEXT VARCHAR (1024) NOT NULL, " +
+                "CREATEDON DATETIME NULL," +
+                "PRIMARY KEY (MIGRATION_ID) )";
+
+            // TODO: Test and improve this - also in Util :)
+            if ( "oracle".equals(sqlService.getVendor()) ) {
+                sql = "CREATE TABLE SAKAI_IDEMPOTENT ( " +
+					"MIGRATION_ID INTEGER, " +
+                    "NOTE VARCHAR (256) NOT NULL, " +
+                    "SQL_TEXT VARCHAR (1024) NOT NULL, " +
+                    "TIMESTAMP DATETIME NULL)";
+            }
+
+            log.info("Creating the SAKAI_IDEMPOTENT Table");
+            log.info(sql);
+            runUpdateSql(sqlService, "IDEMPOTENT-001", sql);
+        }
+    }
 
     /**
      * Get the Metadata for a table
@@ -142,11 +173,85 @@ public class Util {
         ResultSetMetaData md = getMetadata(sqlService, table);
         if ( md == null ) return false;
         ColumnMetaData cm = getColumnMetaData(sqlService, table, column, md);
-		if ( cm != null ) return false;
+        if ( cm != null ) return false;
 
         sqlService.dbWrite(sql);
         log.info("{}: {}",note, sql);
-		return true;
+        return true;
+    }
+
+    /**
+     * Check if we have run an note / sql statement combination before
+     *
+     * @param sqlService Our service
+     * @param note A note such as the JIRA string
+     * @param sql The SQL statement
+     *
+     * @retval boolean true if we have already run this note / sql combination
+     */
+    public static boolean checkMigration(SqlService sqlService, String note, String sql) {
+        String makeSql = "SELECT COUNT(*) FROM SAKAI_IDEMPOTENT WHERE NOTE = ? AND SQL_TEXT = ?";
+
+        final Object[] fields = {note, sql};
+
+        List<Integer> results = sqlService.dbRead(makeSql, fields, new SqlReader() {
+            public Object readSqlResultRecord(ResultSet result)
+            {
+                try
+                {
+                    int count = result.getInt(1);
+                    return Integer.valueOf(count);
+                }
+                catch (SQLException ignore)
+                {
+                    return null;
+                }
+            }
+        });
+
+        if ( results.isEmpty()) return false;
+        return ((Integer) results.get(0)).intValue() > 0;
+    }
+
+    /**
+     * Record that we have run a particular note / sql combination
+     *
+     * @param sqlService Our service
+     * @param note A note such as the JIRA string
+     * @param sql The SQL statement
+     */
+    public static void recordMigration(SqlService sqlService, String note, String sql) {
+
+        String makeSql = "INSERT INTO SAKAI_IDEMPOTENT (NOTE, SQL_TEXT, CREATEDON) VALUES ( ?, ?, NOW() )";
+
+        final Object[] fields = {note, sql};
+
+        log.info("Insert SQL={}", makeSql);
+        sqlService.dbWrite(makeSql, fields);
+    }
+
+    /**
+     * Run a single SQL statement once
+     *
+     * @param sqlService Our service
+     * @param note A note such as the JIRA string
+     * @param sql The SQL statement
+     */
+    public static boolean runMigrationOnce(SqlService sqlService, String note, String sql) {
+        if ( checkMigration(sqlService, note, sql) ) return false;
+
+        int failQuiet = 2;  /* Very very quiet */
+        failQuiet = 0;
+        int count = sqlService.dbWriteCount(sql, null, null, null, failQuiet);
+
+        recordMigration(sqlService, note, sql);
+
+        if ( count >= 0 ) {
+            log.info("{}({}): {}",note, count, sql);
+        } else {
+            log.debug("{}({}): {}",note, count, sql);
+        }
+        return true;
     }
 
     /**
@@ -166,6 +271,7 @@ public class Util {
     public static int runUpdateSql(SqlService sqlService, String note, String sql) {
         int failQuiet = 2;  /* Very very quiet */
         int count = sqlService.dbWriteCount(sql, null, null, null, failQuiet);
+
         if ( count >= 0 ) {
             log.info("{}({}): {}",note, count, sql);
         } else {

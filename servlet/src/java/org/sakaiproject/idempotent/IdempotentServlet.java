@@ -58,23 +58,7 @@ public class IdempotentServlet extends HttpServlet {
 
 		log.debug("DB Vendor: {}", sqlService.getVendor());
 
-		if ( ! Util.tableExists(sqlService, "SAKAI_IDEMPOTENT") ) {
-			String sql = "CREATE TABLE SAKAI_IDEMPOTENT ( " +
-				"NOTE VARCHAR (256) NOT NULL, " +
-				"SQL_TEXT VARCHAR (1024) NOT NULL, " + 
-				"CREATEDON DATETIME NULL)";
-
-			// TODO: Test this :)
-			if ( "oracle".equals(sqlService.getVendor()) ) {
-				sql = "CREATE TABLE SAKAI_IDEMPOTENT ( " +
-					"NOTE VARCHAR (256) NOT NULL, " +
-					"SQL_TEXT VARCHAR (1024) NOT NULL, " + 
-					"TIMESTAMP DATETIME NULL)";
-			}
-
-			log.info("Creating the SAKAI_IDEMPOTENT Table");
-			Util.runUpdateSql(sqlService, "IDEMPOTENT-001", sql);
-		}
+		Util.ensureIdempotentTable(sqlService);
 
 		Sakai23.idempotent(sqlService);
 
