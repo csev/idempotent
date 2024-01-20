@@ -29,9 +29,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import lombok.extern.slf4j.Slf4j;
 
-import java.time.Instant;
-
 import org.sakaiproject.component.api.ServerConfigurationService;
+import org.sakaiproject.db.api.SqlService;
 import org.sakaiproject.util.ResourceLoader;
 
 import org.springframework.context.ApplicationContext;
@@ -48,16 +47,16 @@ public class IdempotentServlet extends HttpServlet {
 	private static ResourceLoader rb = new ResourceLoader("idempotent");
 
 	@Autowired private ServerConfigurationService serverConfigurationService;
+	@Autowired private SqlService sqlService;
 
 	@Override
 	public void init(ServletConfig config) throws ServletException {
 
 		super.init(config);
-		SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(this);
+		SpringBeanAutowiringSupport.processInjectionBasedOnServletContext(this, config.getServletContext());
 
-		ApplicationContext ac = WebApplicationContextUtils.getWebApplicationContext(config.getServletContext());
+		log.info("DB Vendor: {}", sqlService.getVendor());
 
-System.out.println("Idempotent is Alive!!!!");
 	}
 
 }
