@@ -56,7 +56,25 @@ public class IdempotentServlet extends HttpServlet {
 		super.init(config);
 		SpringBeanAutowiringSupport.processInjectionBasedOnServletContext(this, config.getServletContext());
 
-		log.info("DB Vendor: {}", sqlService.getVendor());
+		log.debug("DB Vendor: {}", sqlService.getVendor());
+
+		if ( ! Util.tableExists(sqlService, "SAKAI_IDEMPOTENT") ) {
+			String sql = "CREATE TABLE SAKAI_IDEMPOTENT ( " +
+				"NOTE VARCHAR (256) NOT NULL, " +
+				"SQL_TEXT VARCHAR (1024) NOT NULL, " + 
+				"CREATEDON DATETIME NULL)";
+
+			// TODO: Test this :)
+			if ( "oracle".equals(sqlService.getVendor()) ) {
+				sql = "CREATE TABLE SAKAI_IDEMPOTENT ( " +
+					"NOTE VARCHAR (256) NOT NULL, " +
+					"SQL_TEXT VARCHAR (1024) NOT NULL, " + 
+					"TIMESTAMP DATETIME NULL)";
+			}
+
+			log.info("Creating the SAKAI_IDEMPOTENT Table");
+			Util.runUpdateSql(sqlService, "IDEMPOTENT-001", sql);
+		}
 
 		Sakai23.idempotent(sqlService);
 

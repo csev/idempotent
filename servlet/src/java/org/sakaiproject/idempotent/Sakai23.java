@@ -28,39 +28,38 @@ import org.sakaiproject.db.api.SqlService;
 @Slf4j
 public class Sakai23 {
 
-	public static void idempotent(SqlService sqlService) {
+    public static void idempotent(SqlService sqlService) {
 
-		Util.getMetadata(sqlService, "PINNED_SITES");
+        Util.ensureColumnExists(sqlService,
+            "SAK-48948",
+            "PINNED_SITES", "HAS_BEEN_UNPINNED",
+            "ALTER TABLE PINNED_SITES ADD HAS_BEEN_UNPINNED BIT NOT NULL;"
+        );
 
-		Util.runUpdateSql(sqlService, 
-		   "SAK-48948",
-		   "ALTER TABLE PINNED_SITES ADD HAS_BEEN_UNPINNED BIT NOT NULL;"
-		);
+        // Fix the template
+        Util.runUpdateSql(sqlService, 
+            "SAK-49537",
+            "UPDATE SAKAI_SITE_PAGE SET LAYOUT='0' WHERE PAGE_ID='!plussite-100';"
+        );
 
-		// Fix the template
-		Util.runUpdateSql(sqlService, 
-			"SAK-49537",
-			"UPDATE SAKAI_SITE_PAGE SET LAYOUT='0' WHERE PAGE_ID='!plussite-100';"
-		);
+        // Fix any sites created with the template
+        Util.runUpdateSql(sqlService, 
+            "SAK-49537",
+            "UPDATE SAKAI_SITE_PAGE SET LAYOUT='0' WHERE TITLE='Dashboard';"
+        );
 
-		// Fix any sites created with the template
-		Util.runUpdateSql(sqlService, 
-			"SAK-49537",
-			"UPDATE SAKAI_SITE_PAGE SET LAYOUT='0' WHERE TITLE='Dashboard';"
-		);
+        // Fix Site Type in !plussite template
+        Util.runUpdateSql(sqlService, 
+            "SAK-49633",
+            "UPDATE SAKAI_SITE SET TYPE='course' WHERE SITE_ID = '!plussite';"
+        );
 
-		// Fix Site Type in !plussite template
-		Util.runUpdateSql(sqlService, 
-			"SAK-49633",
-			"UPDATE SAKAI_SITE SET TYPE='course' WHERE SITE_ID = '!plussite';"
-		);
-
-		// Fix Custom Order in !plussite template
-		Util.runUpdateSql(sqlService, 
-			"SAK-49652",
-			"UPDATE SAKAI_SITE SET CUSTOM_PAGE_ORDERED='1' WHERE SITE_ID='!plussite';"
-		);
-	}
+        // Fix Custom Order in !plussite template
+        Util.runUpdateSql(sqlService, 
+            "SAK-49652",
+            "UPDATE SAKAI_SITE SET CUSTOM_PAGE_ORDERED='1' WHERE SITE_ID='!plussite';"
+        );
+    }
 
 }
 
