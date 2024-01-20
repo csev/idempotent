@@ -30,6 +30,8 @@ public class Sakai23 {
 
 	public static void idempotent(SqlService sqlService) {
 
+		Util.getMetadata(sqlService, "PINNED_SITES");
+
 		Util.runUpdateSql(sqlService, 
 		   "SAK-48948",
 		   "ALTER TABLE PINNED_SITES ADD HAS_BEEN_UNPINNED BIT NOT NULL;"
@@ -55,7 +57,7 @@ public class Sakai23 {
 
 		// Fix Custom Order in !plussite template
 		Util.runUpdateSql(sqlService, 
-			"--- SAK-49652",
+			"SAK-49652",
 			"UPDATE SAKAI_SITE SET CUSTOM_PAGE_ORDERED='1' WHERE SITE_ID='!plussite';"
 		);
 	}

@@ -22,14 +22,71 @@ package org.sakaiproject.idempotent;
 
 import lombok.extern.slf4j.Slf4j;
 
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.sql.Statement;
+
 import org.sakaiproject.db.api.SqlService;
 
 @SuppressWarnings("deprecation")
 @Slf4j
 public class Util {
 
-		/* We have to be very quiet because if we do something that has already been done, we will get an "Already exists" error. */
-		/* A return value of -1 indicates any kind of error from duplicate column to SQL syntax error */
+    public static String NUMBER_TYPE = "java.lang.Number";
+    public static String STRING_TYPE = "java.lang.String";
+
+	/**
+	 * Get the Metadata for a table
+	 */
+	public static ResultSetMetaData getMetadata(SqlService sqlService, String table) {
+
+            String query = "SELECT * FROM " + table;
+            Connection conn = null;
+            Statement st = null;
+            ResultSet rs = null;
+            ResultSetMetaData md = null;
+            boolean failed = false;
+            try {
+                conn = sqlService.borrowConnection();
+                st = conn.createStatement();
+                rs =  st.executeQuery(query);
+                md = rs.getMetaData();
+            } catch (SQLException e) {
+                failed = true;
+            } finally {
+                try {
+                    if ( st != null ) st.close();
+                    if ( rs != null ) rs.close();
+                } catch (SQLException sqlex) {
+                    log.error("Error attempt to close Statement or ResultSet", sqlex);
+                }
+                if ( conn != null ) sqlService.returnConnection(conn);
+            }
+
+			String name = null;
+			String sqlType = null;
+            boolean autoIncrement = false;
+            int sqlLength = -1;
+            boolean isNullable = false;
+			try {
+                for( int i = 1; i <= md.getColumnCount(); i++ ) {
+                        name = md.getColumnLabel(i);
+                        sqlLength = md.getColumnDisplaySize(i);
+                        autoIncrement = md.isAutoIncrement(i);
+                        sqlType = getSuperType(md.getColumnClassName(i));
+                        isNullable = (md.isNullable(i) == ResultSetMetaData.columnNullable);
+						log.info("{} {} {}",name, sqlType, sqlLength);
+                }
+            } catch(Exception e) {
+				e.printStackTrace();
+                // ignore
+            }
+
+
+			return md;
+	}
 	/**
 	 * Run a single SQL statement checking for error
 	 *
@@ -55,5 +112,22 @@ public class Util {
 		return count;
 	}
 
+    // Walk the superclass tree to find a more general class to make portability easier
+    // Mostly this marks the various extensions of java.lang.Number as java.lang.Number
+    // to simplify casting
+    public static String getSuperType(String className)
+    {
+        try {
+            Class c = Class.forName(className);
+            while ( c != null ) {
+                if ( STRING_TYPE.equals(c.getName()) ) return STRING_TYPE;
+                if ( NUMBER_TYPE.equals(c.getName()) ) return NUMBER_TYPE;
+                c = c.getSuperclass();
+            }
+        } catch(Exception e) {
+            log.error(e.getMessage(), e);
+        }
+        return className;
+    }
 }
 
