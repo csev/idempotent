@@ -44,25 +44,33 @@ import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 @Slf4j
 public class IdempotentServlet extends HttpServlet {
 
-	private static final long serialVersionUID = 1L;
-	private static ResourceLoader rb = new ResourceLoader("idempotent");
+    private static final long serialVersionUID = 1L;
+    private static ResourceLoader rb = new ResourceLoader("idempotent");
 
-	@Autowired private ServerConfigurationService serverConfigurationService;
-	@Autowired private SqlService sqlService;
+    @Autowired private ServerConfigurationService serverConfigurationService;
+    @Autowired private SqlService sqlService;
 
-	@Override
-	public void init(ServletConfig config) throws ServletException {
+    @Override
+    public void init(ServletConfig config) throws ServletException {
 
-		super.init(config);
-		SpringBeanAutowiringSupport.processInjectionBasedOnServletContext(this, config.getServletContext());
+        super.init(config);
+        SpringBeanAutowiringSupport.processInjectionBasedOnServletContext(this, config.getServletContext());
 
-		log.debug("DB Vendor: {}", sqlService.getVendor());
+        log.debug("DB Vendor: {}", sqlService.getVendor());
 
-		Util.ensureIdempotentTable(sqlService);
+        // TODO:  Fix the Oracle TODOs
+        if ( Util.ORACLE.equals(sqlService.getVendor()) ) {
+            log.error("There is still more work to do for Idempotent to work with Oracle");
+            return;
+        }
 
-		Sakai23.idempotent(sqlService);
+        Util.ensureIdempotentTable(sqlService);
 
-	}
+        // https://github.com/sakaiproject/sakai-reference/blob/master/docs/conversion/sakai_23_0-23_1_mysql_conversion.sql
+        // https://github.com/sakaiproject/sakai-reference/blob/master/docs/conversion/sakai_23_0-23_1_oracle_conversion.sql
+        Sakai_23_0_23_1_Conversion.idempotent(sqlService);
+
+    }
 
 }
 

@@ -52,6 +52,9 @@ It is installed in your Tomcat - it does not even need a Tomcat restart.  When t
 servlet comes up - either because of a fresh deploy or when Sakai is started, it loads
 and does its idempotent thing.
 
+If you are using the Dr. Chuck `sakai-scripts`, a partial compile is done with the `smv.sh`
+command.
+
 If it runs any SQL - that is displayed with a `log.info`.  The very first run, it will create
 it table to track migrations:
 

@@ -40,6 +40,8 @@ public class Util {
     public static String NUMBER_TYPE = "java.lang.Number";
     public static String STRING_TYPE = "java.lang.String";
 
+    public static String ORACLE = "oracle";
+    public static String MYSQL = "mysql";
     /**
      *
      */
@@ -54,12 +56,13 @@ public class Util {
                 "PRIMARY KEY (MIGRATION_ID) )";
 
             // TODO: Test and improve this - also in Util :)
-            if ( "oracle".equals(sqlService.getVendor()) ) {
+            if ( ORACLE.equals(sqlService.getVendor()) ) {
                 sql = "CREATE TABLE SAKAI_IDEMPOTENT ( " +
-					"MIGRATION_ID INTEGER, " +
+                    "MIGRATION_ID INTEGER, " +
                     "NOTE VARCHAR (256) NOT NULL, " +
                     "SQL_TEXT VARCHAR (1024) NOT NULL, " +
                     "TIMESTAMP DATETIME NULL)";
+                log.error("The Oracle Implementation is incomplete");
             }
 
             log.info("Creating the SAKAI_IDEMPOTENT Table");
@@ -67,15 +70,15 @@ public class Util {
         }
     }
 
-	/**
-	 * Run a COUNT QUERY
-	 */
-	public static Integer getCount(SqlService sqlService, String sql)
-	{
-		List<String> results = sqlService.dbRead(sql);
-		if ( results.size() != 1 ) return 0;
-		return ((Integer) Integer.parseInt(results.get(0)));
-	}
+    /**
+     * Run a COUNT QUERY
+     */
+    public static Integer getCount(SqlService sqlService, String sql)
+    {
+        List<String> results = sqlService.dbRead(sql);
+        if ( results.size() != 1 ) return 0;
+        return ((Integer) Integer.parseInt(results.get(0)));
+    }
 
     /**
      * Get the Metadata for a table
@@ -230,7 +233,13 @@ public class Util {
      * @param note A note such as the JIRA string
      * @param sql The SQL statement
      */
+    // TODO: Make this work for Oracle
     public static void recordMigration(SqlService sqlService, String note, String sql) {
+
+        if ( ORACLE.equals(sqlService.getVendor()) ) {
+            log.error("INSERT with auto increment needs a sequence in Oracle... sigh.");
+            return;
+        }
 
         String makeSql = "INSERT INTO SAKAI_IDEMPOTENT (NOTE, SQL_TEXT, CREATEDON) VALUES ( ?, ?, NOW() )";
 

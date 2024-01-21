@@ -25,18 +25,18 @@ public class ColumnMetaData {
     public static String NUMBER_TYPE = "java.lang.Number";
     public static String STRING_TYPE = "java.lang.String";
 
-	public String table = null;
-	public static String name = null;
+    public String table = null;
+    public static String name = null;
     public static String sqlType = null;
     public static boolean autoIncrement = false;
     public static int sqlLength = -1;
     public static boolean isNullable = false;
 
-	@Override
-	public String toString() {
-		String retval = this.table + "." + this.name + " " + this.sqlType + " (" +this.sqlLength + ")";
-		if ( this.isNullable ) retval += " NULL";
-		return retval;
-	}
+    @Override
+    public String toString() {
+        String retval = this.table + "." + this.name + " " + this.sqlType + " (" +this.sqlLength + ")";
+        if ( this.isNullable ) retval += " NULL";
+        return retval;
+    }
 }
 
