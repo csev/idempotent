@@ -63,10 +63,19 @@ public class Util {
             }
 
             log.info("Creating the SAKAI_IDEMPOTENT Table");
-            log.info(sql);
             runUpdateSql(sqlService, "IDEMPOTENT-001", sql);
         }
     }
+
+	/**
+	 * Run a COUNT QUERY
+	 */
+	public static Integer getCount(SqlService sqlService, String sql)
+	{
+		List<String> results = sqlService.dbRead(sql);
+		if ( results.size() != 1 ) return 0;
+		return ((Integer) Integer.parseInt(results.get(0)));
+	}
 
     /**
      * Get the Metadata for a table
@@ -227,7 +236,7 @@ public class Util {
 
         final Object[] fields = {note, sql};
 
-        log.info("Insert SQL={}", makeSql);
+        log.debug("Insert SQL={}", makeSql);
         sqlService.dbWrite(makeSql, fields);
     }
 

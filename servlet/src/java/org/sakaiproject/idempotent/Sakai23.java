@@ -36,29 +36,28 @@ public class Sakai23 {
             "ALTER TABLE PINNED_SITES ADD HAS_BEEN_UNPINNED BIT NOT NULL;"
         );
 
-        // Fix the template
-        Util.runMigrationOnce(sqlService, 
-            "SAK-49537",
-            "UPDATE SAKAI_SITE_PAGE SET LAYOUT='0' WHERE PAGE_ID='!plussite-100';"
-        );
+        // Only apply the !plussite template fixes if the site is there and then only
+		// do each migration once
+		if ( Util.getCount(sqlService, "SELECT COUNT(*) FROM SAKAI_SITE WHERE SITE_ID='!plussite'") > 0 ) {
+			Util.runMigrationOnce(sqlService,
+				"SAK-49537",
+				"UPDATE SAKAI_SITE_PAGE SET LAYOUT='0' WHERE PAGE_ID='!plussite-100';"
+			);
+            Util.runMigrationOnce(sqlService,
+                "SAK-49537",
+                "UPDATE SAKAI_SITE_PAGE SET LAYOUT='0' WHERE TITLE='Dashboard';"
+            );
 
-        // Fix any sites created with the template
-        Util.runMigrationOnce(sqlService, 
-            "SAK-49537",
-            "UPDATE SAKAI_SITE_PAGE SET LAYOUT='0' WHERE TITLE='Dashboard';"
-        );
+			Util.runMigrationOnce(sqlService,
+				"SAK-49633",
+				"UPDATE SAKAI_SITE SET TYPE='course' WHERE SITE_ID = '!plussite';"
+			);
 
-        // Fix Site Type in !plussite template
-        Util.runMigrationOnce(sqlService, 
-            "SAK-49633",
-            "UPDATE SAKAI_SITE SET TYPE='course' WHERE SITE_ID = '!plussite';"
-        );
-
-        // Fix Custom Order in !plussite template
-        Util.runMigrationOnce(sqlService, 
-            "SAK-49652",
-            "UPDATE SAKAI_SITE SET CUSTOM_PAGE_ORDERED='1' WHERE SITE_ID='!plussite';"
-        );
+			Util.runMigrationOnce(sqlService,
+				"SAK-49652",
+				"UPDATE SAKAI_SITE SET CUSTOM_PAGE_ORDERED='1' WHERE SITE_ID='!plussite';"
+			);
+		}
     }
 
 }
