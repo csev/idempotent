@@ -34,6 +34,7 @@ so you must copy one of the given versions of the `pom.xml` to
 `pom.xml`:
 
     cp pom-24-SNAPSHOT.xml pom.xml
+    cp servlet/pom-24-SNAPSHOT.xml servlet/pom.xml
 
 Then just compile it:
 
