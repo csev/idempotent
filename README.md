@@ -6,7 +6,7 @@ migrations that can be applied each time Sakai is compiled and started.
 
 > Idempotence is the property of certain operations in mathematics and
 computer science whereby they can be applied multiple times without
-changing the result beyond the initi
+changing the result beyond the initial
 application. - https://en.wikipedia.org/wiki/Idempotence
 
 This works best for simple schema changes like adding a column to an
@@ -65,13 +65,13 @@ When it detects that a migration is needed it runs logs the SQL:
     o.s.i.Util.runMigrationOnce SAK-49633(1): UPDATE SAKAI_SITE SET TYPE='course'
         WHERE SITE_ID = '!plussite';
 
-Once it has run the migrations, everytime the webapp deploys and starts, it will check if
-there are anymigrations yet to run, and usually finding none it will have no log messages
+Once it has run the migrations, every time the webapp deploys and starts, it will check if
+there are any migrations yet to run, and usually finding none it will have no log messages
 at all.
 
 From time to time, if this is not in the main repo, go into the `idempotent` folder
 do a `git pull` and recompile using `mvn`.   You don't even need to restart Sakai.
-Wiht this approach your schema might time travel into the future a bit, but if
+With this approach your schema might time travel into the future a bit, but if
 the SQL in idempotent is truly idempotent, that is OK.  It is better to have a column
 that is unused before you get the code that will break without the column.
 

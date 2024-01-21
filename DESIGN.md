@@ -66,7 +66,7 @@ or after any upgrade.  It is "idempotent" - you could even run the same
 the ALTER would fail but not harm any data.
 
 The `SAK-49633` is doing a little cleanup on some data that was put into
-a table during an earliier data model migration incorrectly.  Now we need
+a table during an earlier data model migration incorrectly.  Now we need
 to update it to "fix" that mistake.  This statement is "idempotent" because
 it could run over and over and not blow up - but you really want to run it just
 once to fix the "mistake".
@@ -87,7 +87,7 @@ a second time - but since they are "idempotent", it is OK to run them twice.
 Idempotent lets Sakai to get *closer* to a pure cloud deployment where you
 can track a branch in production.
 
-Not all migrations will fit into Idempotent - we will need ot gain experience
+Not all migrations will fit into Idempotent - we will need to gain experience
 in this.  Over time, we might add features to Idempotent to the point where 
 we can handle all or nearly all migrations through this approach.  but that will
 take time and experience.  Initially we will keep expectations low
