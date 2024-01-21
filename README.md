@@ -36,6 +36,11 @@ so you must copy one of the given versions of the `pom.xml` to
     cp pom-24-SNAPSHOT.xml pom.xml
     cp servlet/pom-24-SNAPSHOT.xml servlet/pom.xml
 
+or
+
+    cp pom-23-SNAPSHOT.xml pom.xml
+    cp servlet/pom-23-SNAPSHOT.xml servlet/pom.xml
+
 Then just compile it:
 
     # if needed
