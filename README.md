@@ -82,6 +82,8 @@ that is unused before you get the code that will break without the column.
 TODO: Work to be done
 ---------------------
 
+Investigate: https://www.sitepoint.com/schema-migration-hibernate-flywaydb/
+
 This should almost work with Oracle - the `SAKAI_IDEMPOTENT` table creation SQL needs
 to be better and have a sequence.  And the `INSERT` statement in `Util.recordMigration()`
 needs to be different for Oracle.
