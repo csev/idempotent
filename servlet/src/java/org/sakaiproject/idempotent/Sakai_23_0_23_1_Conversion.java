@@ -65,6 +65,11 @@ public class Sakai_23_0_23_1_Conversion {
                 "UPDATE SAKAI_SITE SET CUSTOM_PAGE_ORDERED='1' WHERE SITE_ID='!plussite';"
             );
         }
+
+        Util.runMigrationOnce(sqlService,
+            "SAK-49584",
+            "UPDATE GB_GRADEBOOK_T SET GRADE_TYPE = 1 WHERE GRADE_TYPE = 0;"
+        );
     }
 
 }
