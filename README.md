@@ -33,8 +33,8 @@ Until this is in the main repo, it does not ship with a `pom.xml`,
 so you must copy one of the given versions of the `pom.xml` to
 `pom.xml`:
 
-    cp pom-24-SNAPSHOT.xml pom.xml
-    cp servlet/pom-24-SNAPSHOT.xml servlet/pom.xml
+    cp pom-25-SNAPSHOT.xml pom.xml
+    cp servlet/pom-25-SNAPSHOT.xml servlet/pom.xml
 
 or
 
