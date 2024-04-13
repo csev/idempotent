@@ -47,6 +47,9 @@ public class IdempotentServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private static ResourceLoader rb = new ResourceLoader("idempotent");
 
+    public static String SAKAI_IDEMPOTENT_ENABLED = "idempotent.enabled";
+    public static boolean SAKAI_IDEMPOTENT_ENABLED_DEFAULT = false;
+
     @Autowired private ServerConfigurationService serverConfigurationService;
     @Autowired private SqlService sqlService;
 
@@ -56,7 +59,12 @@ public class IdempotentServlet extends HttpServlet {
         super.init(config);
         SpringBeanAutowiringSupport.processInjectionBasedOnServletContext(this, config.getServletContext());
 
-        log.debug("DB Vendor: {}", sqlService.getVendor());
+        if ( ! serverConfigurationService.getBoolean(SAKAI_IDEMPOTENT_ENABLED, SAKAI_IDEMPOTENT_ENABLED_DEFAULT)) {
+            log.debug("Idempotent not enabled, enable with {}=true", SAKAI_IDEMPOTENT_ENABLED);
+            return;
+        }
+
+        log.debug("Idempotent enabled. DB Vendor: {}", sqlService.getVendor());
 
         // TODO:  Fix the Oracle TODOs
         if ( Util.ORACLE.equals(sqlService.getVendor()) ) {

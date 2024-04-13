@@ -15,12 +15,20 @@ existing table.
 See the [DESIGN.md](DESIGN.md) file for more information on the
 approach used in this project.
 
+Configuration
+-------------
+
+To enable Idempotent in your Sakai instance (once it is installed) you must
+add the following to your `sakai.properties`:
+
+    idempotent.enabled=true
+
 Installation
 ------------
 
 Idempotent is designed to be part of the Sakai distribution as a top-level
-folder.  But for now it is like a contrib tool so you must manually install
-it.
+folder.  But for now it is in a separate repo like a contrib tool so you
+must manually install it.
 
 First you go into your Sakai source tree and check out this repo:
 
@@ -56,7 +64,7 @@ If you are using the Dr. Chuck `sakai-scripts`, a partial compile is done with t
 command.
 
 If it runs any SQL - that is displayed with a `log.info`.  The very first run, it will create
-it table to track migrations:
+its table to track migrations:
 
     o.s.i.Util.ensureIdempotentTable Creating the SAKAI_IDEMPOTENT Table
     o.s.i.Util.runUpdateSql IDEMPOTENT-001(0): CREATE TABLE SAKAI_IDEMPOTENT ( MIGRATION_ID INT
