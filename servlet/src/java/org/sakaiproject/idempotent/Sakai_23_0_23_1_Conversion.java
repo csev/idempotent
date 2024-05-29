@@ -20,6 +20,8 @@
 
 package org.sakaiproject.idempotent;
 
+import javax.servlet.ServletContext;
+
 import lombok.extern.slf4j.Slf4j;
 
 import org.sakaiproject.db.api.SqlService;
@@ -32,7 +34,7 @@ public class Sakai_23_0_23_1_Conversion {
     // A lot of the simple SQL is the same.  But if the SQL needs to be
     // different just an if-then-else in the code below.  D.R.Y.
 
-    public static void idempotent(SqlService sqlService) {
+    public static void idempotent(ServletContext context, SqlService sqlService) {
 
         Util.ensureColumnExists(sqlService,
             "SAK-48948",

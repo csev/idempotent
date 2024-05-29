@@ -22,11 +22,18 @@ package org.sakaiproject.idempotent;
 
 import java.util.List;
 
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.BufferedReader;
+import java.util.stream.Collectors;
+
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+
+import javax.servlet.ServletContext;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -298,5 +305,18 @@ public class Util {
         }
         return count;
     }
+
+	/**
+	 * Read a file into an array of strings
+	 *
+	 * @param filename The file to open
+	 *
+	 * @retval An attay of Strings, one for each line in the file
+	 */
+	public static String[] fileToArray(ServletContext context, String fileName) {
+        InputStream inputStream = context.getResourceAsStream(fileName);
+        String [] result = new BufferedReader(new InputStreamReader(inputStream)).lines().toArray(String[]::new);
+		return result;
+	}
 }
 
