@@ -80,6 +80,8 @@ public class IdempotentServlet extends HttpServlet {
 
         Sakai_23_1_23_2_Conversion.idempotent(getServletContext(), sqlService);
 
+        Sakai_23_25_Conversion.idempotent(getServletContext(), sqlService);
+
     }
 
 }
