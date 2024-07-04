@@ -21,6 +21,8 @@
 package org.sakaiproject.idempotent;
 
 import java.util.List;
+import java.util.ArrayList;
+import java.lang.StringBuffer;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -311,12 +313,38 @@ public class Util {
 	 *
 	 * @param filename The file to open
 	 *
-	 * @retval An attay of Strings, one for each line in the file
+	 * @retval An array of Strings, one for each line in the file
 	 */
 	public static String[] fileToArray(ServletContext context, String fileName) {
         InputStream inputStream = context.getResourceAsStream(fileName);
         String [] result = new BufferedReader(new InputStreamReader(inputStream)).lines().toArray(String[]::new);
 		return result;
+	}
+
+	/**
+	 * Read a file into an array of SQL commands, looking for semicolons and comments
+	 *
+	 * @param filename The file to open
+	 *
+	 * @retval An array of Strings, one for each SQL command in the file
+	 */
+	public static String[] fileToCommands(ServletContext context, String fileName) {
+        String [] lines = Util.fileToArray(context, fileName);
+		ArrayList<String> retval = new ArrayList<String>();
+		StringBuffer sb = new StringBuffer();
+		for (int i=0; i<lines.length; i++) {
+            String line = lines[i].trim();
+            if ( line.startsWith("--") ) continue;
+
+			sb.append(line);sb.append("\n");
+            if ( line.endsWith(";") ) {
+				retval.add(sb.toString());
+				sb.setLength(0);
+			}
+		}
+
+        if ( sb.length() > 0 ) retval.add(sb.toString());
+		return retval.toArray(String[]::new);
 	}
 }
 
