@@ -51,9 +51,6 @@ or
 
 Then just compile it:
 
-    # if needed
-    export MAVEN_OPTS=-Xms512m -Xmx1024m -Djava.util.Arrays.useLegacyMergeSort=true
-
     mvn -Dmaven.tomcat.home=/Users/csev/sakai/scripts/apache-tomcat-9.0.21 clean install sakai:deploy
 
 It is installed in your Tomcat - it does not even need a Tomcat restart.  When the
