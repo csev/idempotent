@@ -75,10 +75,11 @@ public class IdempotentServlet extends HttpServlet {
         Util.ensureIdempotentTable(sqlService);
 
         // https://github.com/sakaiproject/sakai-reference/blob/master/docs/conversion/sakai_23_0-23_1_mysql_conversion.sql
-        // https://github.com/sakaiproject/sakai-reference/blob/master/docs/conversion/sakai_23_0-23_1_oracle_conversion.sql
         Sakai_23_0_23_1_Conversion.idempotent(getServletContext(), sqlService);
 
         Sakai_23_1_23_2_Conversion.idempotent(getServletContext(), sqlService);
+
+        Sakai_23_2_23_3_Conversion.idempotent(getServletContext(), sqlService);
 
         Sakai_23_25_Conversion.idempotent(getServletContext(), sqlService);
 
