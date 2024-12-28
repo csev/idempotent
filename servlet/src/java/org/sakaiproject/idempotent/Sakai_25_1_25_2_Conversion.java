@@ -28,7 +28,7 @@ import org.sakaiproject.db.api.SqlService;
 
 @SuppressWarnings("deprecation")
 @Slf4j
-public class Sakai_23_25_Conversion {
+public class Sakai_25_1_25_2_Conversion {
 
     // Note that there is one of these that covers both Oracle and MySQL
     // A lot of the simple SQL is the same.  But if the SQL needs to be
@@ -36,7 +36,14 @@ public class Sakai_23_25_Conversion {
 
     public static void idempotent(ServletContext context, SqlService sqlService) {
 
-        // SAK-46714 has been moved to 25_2
+        // SAK-46714
+        String [] lines = Util.fileToArray(context, "/scripts/SAK-46714.sql");
+        for (int i=0; i<lines.length-1; i++) {
+            String sql = lines[i].trim();
+            if ( sql.startsWith("--") ) continue;
+            // System.out.println(i+" "+sql);
+            Util.runUpdateSql(sqlService, "SAK-46714", sql);
+        }
 
     }
 
