@@ -83,6 +83,12 @@ With this approach your schema might time travel into the future a bit, but if
 the SQL in idempotent is truly idempotent, that is OK.  It is better to have a column
 that is unused before you get the code that will break without the column.
 
+Sakai's Conversion Scripts
+--------------------------
+
+In general, the current official source of these conversions is a set of versoin-based conversion scripts:
+
+https://github.com/sakaiproject/sakai-reference/tree/master/docs/conversion
 
 TODO: Work to be done
 ---------------------
