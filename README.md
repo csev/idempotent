@@ -46,6 +46,7 @@ so you must copy one of the given versions of the `pom.xml` to
 
 or
 
+    git checkout 23.x
     cp pom-23-SNAPSHOT.xml pom.xml
     cp servlet/pom-23-SNAPSHOT.xml servlet/pom.xml
 
