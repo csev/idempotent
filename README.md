@@ -41,6 +41,7 @@ Until this is in the main repo, it does not ship with a `pom.xml`,
 so you must copy one of the given versions of the `pom.xml` to
 `pom.xml`:
 
+    git checkout main
     cp pom-25-SNAPSHOT.xml pom.xml
     cp servlet/pom-25-SNAPSHOT.xml servlet/pom.xml
 
